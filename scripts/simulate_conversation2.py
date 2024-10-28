@@ -1,61 +1,86 @@
-"""
-@Time ： 2024-10-28
-@Auth ： Adam Lyu
-"""
-import shutil
 import uuid
 
 from langchain_core.messages import ToolMessage
 from scripts.populate_database import db
 from scripts.populate_database import update_dates
-from scripts.simulate_conversation import tutorial_questions
 from utils.graph2 import part_2_graph
 from utils.utilities import _print_event
 
-# Update with the backup file so we can restart from the original place in each section
+
+# 创建一个示例对话
+tutorial_questions = [
+    "Hi there, what time is my flight?",
+    "Am I allowed to update my flight to something sooner? I want to leave later today.",
+    "Update my flight to sometime next week then",
+    "The next available option is great",
+    "What about lodging and transportation?",
+    "Yeah, I'd like an affordable hotel for my week-long stay (7 days). And I'll want to rent a car.",
+    "OK, could you place a reservation for your recommended hotel? It sounds nice.",
+    "Yes, go ahead and book anything that's moderately priced and has availability.",
+    "Now for a car, what are my options?",
+    "Awesome, let's just get the cheapest option. Go ahead and book for 7 days",
+    "Cool, so now what recommendations do you have on excursions?",
+    "Are they available while I'm there?",
+    "Interesting - I like the museums, what options are there?",
+    "OK, great. Pick one and book it for my second day there.",
+]
+
+# 更新数据库
 db = update_dates(db)
 thread_id = str(uuid.uuid4())
 
 config = {
     "configurable": {
-        # The passenger_id is used in our flight tools to fetch the user's flight information
         "passenger_id": "3442 587242",
-        # Checkpoints are accessed by thread_id
         "thread_id": thread_id,
     }
 }
 
 _printed = set()
-# 我们可以重复使用 part 1 的 tutorial_questions，看看它的表现
+
+# Helper function to generate ToolMessage responses
+def generate_tool_responses(event, messages):
+    if hasattr(event, "tool_calls") and event.tool_calls:
+        for tool_call in event.tool_calls:
+            # 将响应消息附加到消息队列
+            messages.append(
+                ToolMessage(
+                    tool_call_id=tool_call["id"],
+                    content="Simulated tool response."  # 模拟响应内容
+                )
+            )
+    return messages
+
+
+# 主循环
 for question in tutorial_questions:
-    # 初始化 `messages` 字段
     events = part_2_graph.stream(
         {"messages": [("user", question)]}, config, stream_mode="values"
     )
+
     for event in events:
         _print_event(event, _printed)
 
-    # 获取当前的对话状态
+    # 获取最新对话状态
     snapshot = part_2_graph.get_state(config)
-
-    # 从 snapshot 中获取 messages，初始化为空列表防止 snapshot 缺少消息
-    messages = snapshot.get("messages", [])
-
     while snapshot.next:
         try:
             user_input = input(
                 "Do you approve of the above actions? Type 'y' to continue; otherwise, explain your requested changes.\n\n"
             )
-        except:
+        except Exception as e:
+            print(f"Error in input: {e}")
             user_input = "y"
 
-        # 更新 messages 字段并进行 invoke 调用
-        if user_input.strip() == "y":
-            result = part_2_graph.invoke({"messages": messages + [("user", question)]}, config)
+        if user_input.strip().lower() == "y":
+            result = part_2_graph.invoke(
+                None,
+                config,
+            )
         else:
             result = part_2_graph.invoke(
                 {
-                    "messages": messages + [
+                    "messages": [
                         ToolMessage(
                             tool_call_id=event["messages"][-1].tool_calls[0]["id"],
                             content=f"API call denied by user. Reasoning: '{user_input}'. Continue assisting, accounting for the user's input.",
@@ -65,8 +90,5 @@ for question in tutorial_questions:
                 config,
             )
 
-        # 再次获取最新状态和消息
+        # 更新 messages 以确保包含最新的对话内容
         snapshot = part_2_graph.get_state(config)
-        messages = snapshot.get("messages", [])
-
-
