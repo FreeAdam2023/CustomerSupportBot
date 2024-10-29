@@ -5,8 +5,8 @@
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START
 from langgraph.prebuilt import tools_condition
-from chatgpt_assistant import Assistant, part_1_assistant_runnable, part_1_tools
-from state import State
+from assistant.assistant import Assistant, part_1_assistant_runnable, part_1_tools
+from state.state import State
 from utils.utilities import create_tool_node_with_fallback
 
 builder = StateGraph(State)

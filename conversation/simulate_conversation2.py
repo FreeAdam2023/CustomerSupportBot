@@ -3,7 +3,7 @@ import uuid
 from langchain_core.messages import ToolMessage
 from scripts.populate_database import db
 from scripts.populate_database import update_dates
-from utils.graph2 import part_2_graph
+from graph.graph2 import part_2_graph
 from utils.utilities import _print_event
 
 

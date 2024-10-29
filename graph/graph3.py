@@ -2,18 +2,17 @@
 @Time ： 2024-10-28
 @Auth ： Adam Lyu
 """
-from typing import Literal
 
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import tools_condition
 
-from chatgpt_assistant3 import Assistant, part_3_assistant_runnable, sensitive_tool_names, part_3_sensitive_tools, \
+from assistant.assistant import Assistant, part_3_assistant_runnable, sensitive_tool_names, part_3_sensitive_tools, \
     part_3_safe_tools
 from tools.flight_tools import fetch_user_flight_information
 
-from state3 import State
+from state.state3 import State
 from utils.utilities import create_tool_node_with_fallback
 
 builder = StateGraph(State)

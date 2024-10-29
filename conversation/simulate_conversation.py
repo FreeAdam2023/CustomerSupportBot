@@ -2,11 +2,10 @@
 @Time ： 2024-10-28
 @Auth ： Adam Lyu
 """
-import shutil
 import uuid
 from scripts.populate_database import db
 from scripts.populate_database import update_dates
-from utils.graph import part_1_graph
+from graph.graph import part_1_graph
 from utils.utilities import _print_event
 
 # Let's create an example conversation a user might have with the assistant

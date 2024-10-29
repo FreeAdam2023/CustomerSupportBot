@@ -10,7 +10,7 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
 
-from state import State
+from state.state import State
 from tools.car_rental_tools import search_car_rentals, book_car_rental, update_car_rental, cancel_car_rental
 from tools.excursion_tools import search_trip_recommendations, book_excursion, update_excursion, cancel_excursion
 from tools.flight_tools import fetch_user_flight_information, search_flights, update_ticket_to_new_flight, cancel_ticket

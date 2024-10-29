@@ -1,10 +1,9 @@
-import shutil
 import uuid
 
 from langchain_core.messages import ToolMessage
 from scripts.populate_database import db
 from scripts.populate_database import update_dates
-from utils.graph3 import part_3_graph
+from graph.graph3 import part_3_graph
 from utils.utilities import _print_event
 
 # Update with the backup file so we can restart from the original place in each section

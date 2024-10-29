@@ -6,10 +6,10 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.constants import START
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import tools_condition
-from state2 import State
+from state.state2 import State
 from tools.flight_tools import fetch_user_flight_information
-from chatgpt_assistant import Assistant
-from chatgpt_assistant2 import part_2_assistant_runnable, part_2_tools
+from assistant.assistant import Assistant
+from assistant.assistant import part_2_assistant_runnable, part_2_tools
 from utils.utilities import create_tool_node_with_fallback
 
 

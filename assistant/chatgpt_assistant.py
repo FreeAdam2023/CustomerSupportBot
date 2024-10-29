@@ -1,28 +1,36 @@
+"""
+@Time ： 2024-10-28
+@Auth ： Adam Lyu
+"""
 import os
 from datetime import datetime
-from langchain_openai import ChatOpenAI
-from langchain_community.tools.tavily_search import TavilySearchResults
+
+from langchain_community.tools import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
+from langchain_openai import ChatOpenAI
+
+from state.state import State
+
 from tools.car_rental_tools import search_car_rentals, book_car_rental, update_car_rental, cancel_car_rental
 from tools.excursion_tools import search_trip_recommendations, book_excursion, update_excursion, cancel_excursion
 from tools.flight_tools import fetch_user_flight_information, search_flights, update_ticket_to_new_flight, cancel_ticket
 from tools.hotel_tools import search_hotels, book_hotel, update_hotel, cancel_hotel
 from tools.lookup_policy import lookup_policy
 from dotenv import load_dotenv
-from state2 import State
 
 load_dotenv()  # 加载 .env 文件中的环境变量
 
-# Assistant 类，用于处理调用逻辑
 class Assistant:
     def __init__(self, runnable: Runnable):
         self.runnable = runnable
 
     def __call__(self, state: State, config: RunnableConfig):
         while True:
+            configuration = config.get("configurable", {})
+            passenger_id = configuration.get("passenger_id", None)
+            state = {**state, "user_info": passenger_id}
             result = self.runnable.invoke(state)
-            # 检查是否有返回内容，若无则重新生成提示信息
             if not result.tool_calls and (
                 not result.content
                 or isinstance(result.content, list)
@@ -34,11 +42,11 @@ class Assistant:
                 break
         return {"messages": result}
 
-# 使用 ChatOpenAI 替换 ChatAnthropic
+# 替换 ChatAnthropic 为 ChatOpenAI
 llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY'))
 
-# 创建提示模板
-assistant_prompt = ChatPromptTemplate.from_messages(
+# 提示模板保持不变
+primary_assistant_prompt = ChatPromptTemplate.from_messages(
     [
         (
             "system",
@@ -53,8 +61,8 @@ assistant_prompt = ChatPromptTemplate.from_messages(
     ]
 ).partial(time=datetime.now())
 
-# 定义可用的工具
-part_2_tools = [
+
+part_1_tools = [
     TavilySearchResults(max_results=1, tavily_api_key=os.getenv('TAVILY_API_KEY')),
     fetch_user_flight_information,
     search_flights,
@@ -74,6 +82,4 @@ part_2_tools = [
     update_excursion,
     cancel_excursion,
 ]
-
-# 绑定工具并创建 Assistant 实例
-part_2_assistant_runnable = assistant_prompt | llm.bind_tools(part_2_tools)
+part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_1_tools)
