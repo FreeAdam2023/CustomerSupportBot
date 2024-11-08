@@ -2,6 +2,7 @@
 @Time ： 2024-10-28
 @Auth ： Adam Lyu
 """
+import json
 import os
 from datetime import datetime
 
@@ -27,19 +28,20 @@ class Assistant:
 
     def __call__(self, state: State, config: RunnableConfig):
         while True:
+            # print(f"state -> {state}")
+            # print(json.dumps(state, indent=4, ensure_ascii=False))
             result = self.runnable.invoke(state)
 
             if not result.tool_calls and (
-                not result.content
-                or isinstance(result.content, list)
-                and not result.content[0].get("text")
+                    not result.content
+                    or isinstance(result.content, list)
+                    and not result.content[0].get("text")
             ):
                 messages = state["messages"] + [("user", "Respond with a real output.")]
                 state = {**state, "messages": messages}
             else:
                 break
         return {"messages": result}
-
 
 
 class CompleteOrEscalate(BaseModel):
@@ -64,6 +66,7 @@ class CompleteOrEscalate(BaseModel):
                 "reason": "I need to search the user's emails or calendar for more information.",
             },
         }
+
 
 llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY'))
 

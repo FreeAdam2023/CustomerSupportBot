@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalized Workout Plan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f3f3f3;
+    }
+    .container {
+      width: 350px;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .hidden {
+      display: none;
+    }
+    .form-group {
+      margin: 10px 0;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+    }
+    .tag {
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .tag:hover {
+      background-color: #45a049;
+    }
+    .button {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Profile Input Page -->
+  <div id="profile-setup" class="page">
+    <h2>Profile Setup</h2>
+    <div class="form-group">
+      <label for="age">Age:</label>
+      <input type="number" id="age">
+    </div>
+    <div class="form-group">
+      <label for="weight">Weight (kg):</label>
+      <input type="number" id="weight">
+    </div>
+    <div class="form-group">
+      <label for="height">Height (cm):</label>
+      <input type="number" id="height">
+    </div>
+    <div class="form-group">
+      <label for="fitness-goals">Fitness Goals:</label>
+      <input type="text" id="fitness-goals">
+    </div>
+    <div class="form-group">
+      <label for="exercise-preferences">Exercise Preferences:</label>
+      <input type="text" id="exercise-preferences">
+    </div>
+    <div class="form-group">
+      <label for="equipment">Available Equipment (select multiple):</label>
+      <select id="equipment" multiple onchange="updateEquipmentTags()">
+        <option value="Dumbbells">Dumbbells</option>
+        <option value="Treadmill">Treadmill</option>
+        <option value="Resistance Bands">Resistance Bands</option>
+        <option value="Exercise Bike">Exercise Bike</option>
+        <option value="Kettlebell">Kettlebell</option>
+      </select>
+      <div id="tag-container" class="tag-container"></div>
+    </div>
+    <div class="form-group">
+      <label for="days">Workout Days per Week:</label>
+      <input type="number" id="days" min="1" max="7" placeholder="1-7">
+    </div>
+    <div class="form-group">
+      <label for="duration">Session Duration (mins):</label>
+      <input type="number" id="duration" min="10" max="120" placeholder="10-120">
+    </div>
+    <button class="button" onclick="goToCalendar()">Generate Workout Plan</button>
+  </div>
+
+  <!-- Workout Plan Calendar Page -->
+  <div id="workout-calendar" class="page hidden">
+    <h2>Workout Plan Calendar</h2>
+    <p>Your personalized workout plan based on your goals:</p>
+    <div class="form-group">
+      <label for="goal">Choose Your Fitness Goal:</label>
+      <select id="goal">
+        <option value="strength">Strength</option>
+        <option value="weight-loss">Weight Loss</option>
+        <option value="flexibility">Flexibility</option>
+      </select>
+    </div>
+    <p><strong>Monday:</strong> Strength Training</p>
+    <p><strong>Wednesday:</strong> Cardio Workout</p>
+    <p><strong>Friday:</strong> Flexibility Workout</p>
+    <button class="button" onclick="goToProfile()">Return to Profile</button>
+  </div>
+</div>
+
+<script>
+  function updateEquipmentTags() {
+    const select = document.getElementById('equipment');
+    const container = document.getElementById('tag-container');
+    container.innerHTML = ''; // Clear existing tags
+
+    Array.from(select.selectedOptions).forEach(option => {
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.textContent = option.value;
+      tag.onclick = () => removeTag(option.value);
+      container.appendChild(tag);
+    });
+  }
+
+  function removeTag(value) {
+    const select = document.getElementById('equipment');
+    Array.from(select.options).forEach(option => {
+      if (option.value === value) option.selected = false;
+    });
+    updateEquipmentTags();
+  }
+
+  function goToCalendar() {
+    document.getElementById('profile-setup').classList.add('hidden');
+    document.getElementById('workout-calendar').classList.remove('hidden');
+  }
+
+  function goToProfile() {
+    document.getElementById('workout-calendar').classList.add('hidden');
+    document.getElementById('profile-setup').classList.remove('hidden');
+  }
+</script>
+
+</body>
+</html>
