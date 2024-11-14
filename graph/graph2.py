@@ -9,7 +9,7 @@ from langgraph.prebuilt import tools_condition
 from state.state2 import State
 from tools.flight_tools import fetch_user_flight_information
 from assistant.assistant import Assistant
-from assistant.assistant import part_2_assistant_runnable, part_2_tools
+from assistant.chatgpt_assistant2 import part_2_assistant_runnable, part_2_tools
 from utils.utilities import create_tool_node_with_fallback
 
 

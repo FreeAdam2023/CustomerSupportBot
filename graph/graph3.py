@@ -8,7 +8,7 @@ from langgraph.constants import START, END
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import tools_condition
 
-from assistant.assistant import Assistant, part_3_assistant_runnable, sensitive_tool_names, part_3_sensitive_tools, \
+from assistant.chatgpt_assistant3 import Assistant, part_3_assistant_runnable, sensitive_tool_names, part_3_sensitive_tools, \
     part_3_safe_tools
 from tools.flight_tools import fetch_user_flight_information
 
