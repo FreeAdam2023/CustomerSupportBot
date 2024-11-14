@@ -68,7 +68,7 @@ class CompleteOrEscalate(BaseModel):
         }
 
 
-llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY'))
+llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY')) # gpt-4-turbo  gpt-3.5-turbo
 
 # Flight booking assistant
 

@@ -6,27 +6,21 @@ import sqlite3
 from typing import Optional
 
 from langchain_core.tools import tool
+from utils.logger import logger  # 导入自定义日志记录工具
 
 from scripts.populate_database import db
 
 
 @tool
 def search_trip_recommendations(
-    location: Optional[str] = None,
-    name: Optional[str] = None,
-    keywords: Optional[str] = None,
+        location: Optional[str] = None,
+        name: Optional[str] = None,
+        keywords: Optional[str] = None,
 ) -> list[dict]:
     """
     Search for trip recommendations based on location, name, and keywords.
-
-    Args:
-        location (Optional[str]): The location of the trip recommendation. Defaults to None.
-        name (Optional[str]): The name of the trip recommendation. Defaults to None.
-        keywords (Optional[str]): The keywords associated with the trip recommendation. Defaults to None.
-
-    Returns:
-        list[dict]: A list of trip recommendation dictionaries matching the search criteria.
     """
+    logger.info("Starting search for trip recommendations.")
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -47,9 +41,9 @@ def search_trip_recommendations(
 
     cursor.execute(query, params)
     results = cursor.fetchall()
-
     conn.close()
 
+    logger.info(f"Search completed. Found {len(results)} recommendations.")
     return [
         dict(zip([column[0] for column in cursor.description], row)) for row in results
     ]
@@ -58,14 +52,9 @@ def search_trip_recommendations(
 @tool
 def book_excursion(recommendation_id: int) -> str:
     """
-    Book a excursion by its recommendation ID.
-
-    Args:
-        recommendation_id (int): The ID of the trip recommendation to book.
-
-    Returns:
-        str: A message indicating whether the trip recommendation was successfully booked or not.
+    Book an excursion by its recommendation ID.
     """
+    logger.info(f"Attempting to book excursion with ID {recommendation_id}.")
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -76,9 +65,11 @@ def book_excursion(recommendation_id: int) -> str:
 
     if cursor.rowcount > 0:
         conn.close()
+        logger.info(f"Trip recommendation {recommendation_id} successfully booked.")
         return f"Trip recommendation {recommendation_id} successfully booked."
     else:
         conn.close()
+        logger.warning(f"No trip recommendation found with ID {recommendation_id}.")
         return f"No trip recommendation found with ID {recommendation_id}."
 
 
@@ -86,14 +77,8 @@ def book_excursion(recommendation_id: int) -> str:
 def update_excursion(recommendation_id: int, details: str) -> str:
     """
     Update a trip recommendation's details by its ID.
-
-    Args:
-        recommendation_id (int): The ID of the trip recommendation to update.
-        details (str): The new details of the trip recommendation.
-
-    Returns:
-        str: A message indicating whether the trip recommendation was successfully updated or not.
     """
+    logger.info(f"Updating details for trip recommendation ID {recommendation_id}.")
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -105,9 +90,11 @@ def update_excursion(recommendation_id: int, details: str) -> str:
 
     if cursor.rowcount > 0:
         conn.close()
+        logger.info(f"Trip recommendation {recommendation_id} successfully updated.")
         return f"Trip recommendation {recommendation_id} successfully updated."
     else:
         conn.close()
+        logger.warning(f"No trip recommendation found with ID {recommendation_id}.")
         return f"No trip recommendation found with ID {recommendation_id}."
 
 
@@ -115,13 +102,8 @@ def update_excursion(recommendation_id: int, details: str) -> str:
 def cancel_excursion(recommendation_id: int) -> str:
     """
     Cancel a trip recommendation by its ID.
-
-    Args:
-        recommendation_id (int): The ID of the trip recommendation to cancel.
-
-    Returns:
-        str: A message indicating whether the trip recommendation was successfully cancelled or not.
     """
+    logger.info(f"Attempting to cancel excursion with ID {recommendation_id}.")
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
@@ -132,7 +114,9 @@ def cancel_excursion(recommendation_id: int) -> str:
 
     if cursor.rowcount > 0:
         conn.close()
+        logger.info(f"Trip recommendation {recommendation_id} successfully cancelled.")
         return f"Trip recommendation {recommendation_id} successfully cancelled."
     else:
         conn.close()
+        logger.warning(f"No trip recommendation found with ID {recommendation_id}.")
         return f"No trip recommendation found with ID {recommendation_id}."
