@@ -12,13 +12,12 @@ from assistant.expert_assistant import CompleteOrEscalate, update_flight_safe_to
     book_car_rental_runnable, book_hotel_safe_tools, book_hotel_sensitive_tools, book_hotel_runnable, \
     book_excursion_safe_tools, book_excursion_sensitive_tools, book_excursion_runnable, ToFlightBookingAssistant, \
     ToBookCarRental, ToHotelBookingAssistant, ToBookExcursion, primary_assistant_tools, assistant_runnable
-from state.entry_nodes import create_entry_node
 from state.state import State
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import tools_condition
 from tools.flight_tools import fetch_user_flight_information
-from utils.utilities import create_tool_node_with_fallback
+from utils.utilities import create_tool_node_with_fallback, create_entry_node
 
 builder = StateGraph(State)
 
@@ -291,7 +290,7 @@ builder.add_conditional_edges("fetch_user_info", route_to_workflow)
 
 # Compile graph
 memory = MemorySaver()
-part_4_graph = builder.compile(
+part_graph = builder.compile(
     checkpointer=memory,
     # Let the user approve or deny the use of sensitive tools
     interrupt_before=[

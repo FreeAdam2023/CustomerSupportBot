@@ -7,7 +7,7 @@ import uuid
 from scripts.populate_database import db
 from langchain_core.messages import ToolMessage
 from utils.logger import logger
-from graph.graph import part_4_graph
+from graph.graph import part_graph
 from scripts.populate_database import update_dates
 from utils.utilities import _print_event
 
@@ -75,13 +75,13 @@ _printed = set()
 
 def test_conversation():
     for question in tutorial_questions:
-        events = part_4_graph.stream(
+        events = part_graph.stream(
             {"messages": ("user", question)}, config, stream_mode="values"
         )
         for event in events:
             _print_event(event, _printed)
             logger.debug(f"Event processed: {event}")
-        snapshot = part_4_graph.get_state(config)
+        snapshot = part_graph.get_state(config)
         while snapshot.next:
             # 我们有一个中断！代理正在尝试使用工具，用户可以批准或拒绝它
             # 注意：此代码全部位于您的图表之外。通常，您会将输出流式传输到 UI。 # 然后，当用户提供输入时，您将让前端通过 API 调用触发新的运行。
@@ -96,13 +96,13 @@ def test_conversation():
             except:
                 user_input = "y"
             if user_input.strip() == "y":
-                result = part_4_graph.invoke(
+                result = part_graph.invoke(
                     None,
                     config,
                 )
                 logger.debug(f"Invoke result: {result}")
             else:
-                result = part_4_graph.invoke(
+                result = part_graph.invoke(
                     {
                         "messages": [
                             ToolMessage(
@@ -114,20 +114,20 @@ def test_conversation():
                     config,
                 )
                 logger.debug(f"Invoke result after user denial: {result}")
-            snapshot = part_4_graph.get_state(config)
+            snapshot = part_graph.get_state(config)
             logger.debug(f"New snapshot state: {snapshot}")
 
 
 if __name__ == "__main__":
     while True:
         question = input("input question please\n\n")
-        events = part_4_graph.stream(
+        events = part_graph.stream(
             {"messages": ("user", question)}, config, stream_mode="values"
         )
         for event in events:
             _print_event(event, _printed)
             logger.debug(f"Event processed: {event}")
-        snapshot = part_4_graph.get_state(config)
+        snapshot = part_graph.get_state(config)
         while snapshot.next:
             # 如果有中断，记录当前调用的 tool_call_id 和事件
             if 'tool_calls' in event["messages"][-1]:
@@ -140,13 +140,13 @@ if __name__ == "__main__":
             except:
                 user_input = "y"
             if user_input.strip() == "y":
-                result = part_4_graph.invoke(
+                result = part_graph.invoke(
                     None,
                     config,
                 )
                 logger.debug(f"Invoke result: {result}")
             else:
-                result = part_4_graph.invoke(
+                result = part_graph.invoke(
                     {
                         "messages": [
                             ToolMessage(
@@ -158,5 +158,5 @@ if __name__ == "__main__":
                     config,
                 )
                 logger.debug(f"Invoke result after user denial: {result}")
-            snapshot = part_4_graph.get_state(config)
+            snapshot = part_graph.get_state(config)
             logger.debug(f"New snapshot state: {snapshot}")
