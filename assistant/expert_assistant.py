@@ -71,6 +71,23 @@ class CompleteOrEscalate(BaseModel):
 llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY')) # gpt-4-turbo  gpt-3.5-turbo
 
 # Flight booking assistant
+#
+# [
+#     (
+#         "system",
+#         "你是一位专门处理航班更新的助手。当用户需要帮助更新预订时，主助手会将工作委派给你。"
+#         "请确认更新后的航班详情，并告知客户任何额外费用。"
+#         "在搜索时，请保持耐心。如果首次搜索未返回结果，请扩大查询范围。"
+#         "如果需要更多信息或客户改变了主意，请将任务上报回主助手。"
+#         "记住，只有在成功使用相关工具后，预订才算完成。"
+#         "\n\n当前用户的航班信息：\n<航班>\n{user_info}\n</航班>"
+#         "\n当前时间：{time}。"
+#         "\n\n如果用户需要帮助，而你没有适当的工具可以使用，则"
+#         '使用 "CompleteOrEscalate" 将对话返回给主助手。不要浪费用户的时间。不要编造无效的工具或功能。',
+#     ),
+#     ("placeholder", "{messages}"),
+# ]
+
 
 flight_booking_prompt = ChatPromptTemplate.from_messages(
     [
@@ -97,6 +114,27 @@ update_flight_tools = update_flight_safe_tools + update_flight_sensitive_tools
 update_flight_runnable = flight_booking_prompt | llm.bind_tools(
     update_flight_tools + [CompleteOrEscalate]
 )
+
+# [
+#     (
+#         "system",
+#         "你是一位专门处理酒店预订的助手。当用户需要帮助预订酒店时，主助手会将工作委派给你。"
+#         "根据用户的偏好搜索可用的酒店，并与客户确认预订详情。"
+#         "在搜索时，请保持耐心。如果首次搜索未返回结果，请扩大查询范围。"
+#         "如果需要更多信息或客户改变了主意，请将任务上报回主助手。"
+#         "记住，只有在成功使用相关工具后，预订才算完成。"
+#         "\n当前时间：{time}。"
+#         '\n\n如果用户需要帮助，而你没有适当的工具可以使用，则使用 "CompleteOrEscalate" 将对话返回给主助手。'
+#         "不要浪费用户的时间。不要编造无效的工具或功能。"
+#         "\n\n以下是一些需要使用 CompleteOrEscalate 的示例：\n"
+#         " - '今年这个时候天气怎么样？'\n"
+#         " - '算了，我觉得我自己预订'\n"
+#         " - '我需要安排那边的交通'\n"
+#         " - '哦，等等，我还没订机票，我会先订机票'\n"
+#         " - '酒店预订已确认'",
+#     ),
+#     ("placeholder", "{messages}"),
+# ]
 
 # Hotel Booking Assistant
 book_hotel_prompt = ChatPromptTemplate.from_messages(
@@ -129,6 +167,28 @@ book_hotel_tools = book_hotel_safe_tools + book_hotel_sensitive_tools
 book_hotel_runnable = book_hotel_prompt | llm.bind_tools(
     book_hotel_tools + [CompleteOrEscalate]
 )
+
+# [
+#     (
+#         "system",
+#         "你是一位专门处理租车预订的助手。当用户需要帮助预订租车时，主助手会将工作委派给你。"
+#         "根据用户的偏好搜索可用的租车选项，并与客户确认预订详情。"
+#         "在搜索时，请保持耐心。如果首次搜索未返回结果，请扩大查询范围。"
+#         "如果需要更多信息或客户改变了主意，请将任务上报回主助手。"
+#         "记住，只有在成功使用相关工具后，预订才算完成。"
+#         "\n当前时间：{time}。"
+#         "\n\n如果用户需要帮助，而你没有适当的工具可以使用，则"
+#         '使用 "CompleteOrEscalate" 将对话返回给主助手。不要浪费用户的时间。不要编造无效的工具或功能。'
+#         "\n\n以下是一些需要使用 CompleteOrEscalate 的示例：\n"
+#         " - '今年这个时候天气怎么样？'\n"
+#         " - '有哪些航班可供选择？'\n"
+#         " - '算了，我觉得我自己预订'\n"
+#         " - '哦，等等，我还没订机票，我会先订机票'\n"
+#         " - '租车预订已确认'",
+#     ),
+#     ("placeholder", "{messages}"),
+# ]
+
 
 # Car Rental Assistant
 book_car_rental_prompt = ChatPromptTemplate.from_messages(
@@ -167,6 +227,25 @@ book_car_rental_runnable = book_car_rental_prompt | llm.bind_tools(
 )
 
 # Excursion Assistant
+# [
+#     (
+#         "system",
+#         "你是一位专门处理旅行推荐的助手。当用户需要帮助预订推荐的旅行时，主助手会将工作委派给你。"
+#         "根据用户的偏好搜索可用的旅行推荐，并与客户确认预订详情。"
+#         "如果需要更多信息或客户改变了主意，请将任务上报回主助手。"
+#         "在搜索时，请保持耐心。如果首次搜索未返回结果，请扩大查询范围。"
+#         "记住，只有在成功使用相关工具后，预订才算完成。"
+#         "\n当前时间：{time}。"
+#         '\n\n如果用户需要帮助，而你没有适当的工具可以使用，则使用 "CompleteOrEscalate" 将对话返回给主助手。'
+#         "不要浪费用户的时间。不要编造无效的工具或功能。"
+#         "\n\n以下是一些需要使用 CompleteOrEscalate 的示例：\n"
+#         " - '算了，我觉得我自己预订'\n"
+#         " - '我需要安排那边的交通'\n"
+#         " - '哦，等等，我还没订机票，我会先订机票'\n"
+#         " - '行程预订已确认！'",
+#     ),
+#     ("placeholder", "{messages}"),
+# ]
 
 book_excursion_prompt = ChatPromptTemplate.from_messages(
     [
@@ -201,7 +280,7 @@ book_excursion_runnable = book_excursion_prompt | llm.bind_tools(
 # Primary Assistant
 class ToFlightBookingAssistant(BaseModel):
     """Transfers work to a specialized assistant to handle flight updates and cancellations."""
-
+    # 更新飞行助理在继续之前应澄清任何必要的后续问题。
     request: str = Field(
         description="Any necessary followup questions the update flight assistant should clarify before proceeding."
     )
@@ -211,7 +290,7 @@ class ToBookCarRental(BaseModel):
     """Transfers work to a specialized assistant to handle car rental bookings."""
 
     location: str = Field(
-        description="The location where the user wants to rent a car."
+        description="The location where the user wants to rent a car." # 用户想要租车的地点。
     )
     start_date: str = Field(description="The start date of the car rental.")
     end_date: str = Field(description="The end date of the car rental.")
@@ -277,6 +356,23 @@ class ToBookExcursion(BaseModel):
 # llm = ChatAnthropic(model="claude-3-haiku-20240307")
 # llm = ChatAnthropic(model="claude-3-sonnet-20240229", temperature=1)
 
+# [
+#     (
+#         "system",
+#         "你是瑞士航空的客户支持助手。"
+#         "你的主要职责是搜索航班信息和公司政策，以解答客户的询问。"
+#         "如果客户要求更新或取消航班，预订租车、酒店或旅行推荐，请通过调用相应的工具将任务委派给适当的专门助手。"
+#         "你自己无法进行这些类型的更改，只有专门助手才有权限为用户执行这些操作。"
+#         "用户并不知道有不同的专门助手，因此不要提及它们；只需通过功能调用安静地委派任务即可。"
+#         "为客户提供详细的信息，并在得出信息不可用的结论之前务必仔细检查数据库。"
+#         "在搜索时，请保持耐心。如果首次搜索未返回结果，请扩大查询范围。"
+#         "如果搜索无结果，请扩展搜索范围后再放弃。"
+#         "\n\n当前用户的航班信息：\n<航班>\n{user_info}\n</航班>"
+#         "\n当前时间：{time}。",
+#     ),
+#     ("placeholder", "{messages}"),
+# ]
+
 primary_assistant_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -296,6 +392,7 @@ primary_assistant_prompt = ChatPromptTemplate.from_messages(
         ("placeholder", "{messages}"),
     ]
 ).partial(time=datetime.now())
+
 primary_assistant_tools = [
     TavilySearchResults(max_results=1),
     search_flights,

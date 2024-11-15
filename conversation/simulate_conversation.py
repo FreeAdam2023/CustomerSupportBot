@@ -6,7 +6,7 @@ import shutil
 import uuid
 from scripts.populate_database import db
 from langchain_core.messages import ToolMessage
-
+from utils.logger import logger
 from graph.graph import part_4_graph
 from scripts.populate_database import update_dates
 from utils.utilities import _print_event
@@ -68,10 +68,7 @@ tutorial_questions = [
 
 _printed = set()
 # We can reuse the tutorial questions from part 1 to see how it does.
-import logging
 
-# 初始化日志
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def test_conversation():
@@ -81,13 +78,13 @@ def test_conversation():
         )
         for event in events:
             _print_event(event, _printed)
-            logging.debug(f"Event processed: {event}")
+            logger.debug(f"Event processed: {event}")
         snapshot = part_4_graph.get_state(config)
         while snapshot.next:
             # 如果有中断，记录当前调用的 tool_call_id 和事件
             if 'tool_calls' in event["messages"][-1]:
                 for tool_call in event["messages"][-1]['tool_calls']:
-                    logging.debug(f"Handling tool call: {tool_call['id']} for function {tool_call['name']}")
+                    logger.debug(f"Handling tool call: {tool_call['id']} for function {tool_call['name']}")
             # 继续对用户请求的操作
             try:
                 user_input = input("Do you approve of the above actions? Type 'y' to continue;"
@@ -99,7 +96,7 @@ def test_conversation():
                     None,
                     config,
                 )
-                logging.debug(f"Invoke result: {result}")
+                logger.debug(f"Invoke result: {result}")
             else:
                 result = part_4_graph.invoke(
                     {
@@ -112,9 +109,9 @@ def test_conversation():
                     },
                     config,
                 )
-                logging.debug(f"Invoke result after user denial: {result}")
+                logger.debug(f"Invoke result after user denial: {result}")
             snapshot = part_4_graph.get_state(config)
-            logging.debug(f"New snapshot state: {snapshot}")
+            logger.debug(f"New snapshot state: {snapshot}")
 
 
 if __name__ == "__main__":
@@ -125,13 +122,13 @@ if __name__ == "__main__":
         )
         for event in events:
             _print_event(event, _printed)
-            logging.debug(f"Event processed: {event}")
+            logger.debug(f"Event processed: {event}")
         snapshot = part_4_graph.get_state(config)
         while snapshot.next:
             # 如果有中断，记录当前调用的 tool_call_id 和事件
             if 'tool_calls' in event["messages"][-1]:
                 for tool_call in event["messages"][-1]['tool_calls']:
-                    logging.debug(f"Handling tool call: {tool_call['id']} for function {tool_call['name']}")
+                    logger.debug(f"Handling tool call: {tool_call['id']} for function {tool_call['name']}")
             # 继续对用户请求的操作
             try:
                 user_input = input("Do you approve of the above actions? Type 'y' to continue;"
@@ -143,7 +140,7 @@ if __name__ == "__main__":
                     None,
                     config,
                 )
-                logging.debug(f"Invoke result: {result}")
+                logger.debug(f"Invoke result: {result}")
             else:
                 result = part_4_graph.invoke(
                     {
@@ -156,6 +153,6 @@ if __name__ == "__main__":
                     },
                     config,
                 )
-                logging.debug(f"Invoke result after user denial: {result}")
+                logger.debug(f"Invoke result after user denial: {result}")
             snapshot = part_4_graph.get_state(config)
-            logging.debug(f"New snapshot state: {snapshot}")
+            logger.debug(f"New snapshot state: {snapshot}")
