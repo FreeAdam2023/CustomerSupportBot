@@ -30,7 +30,6 @@ def user_info(state: State):
 builder.add_node("fetch_user_info", user_info)
 builder.add_edge(START, "fetch_user_info")
 
-
 # Flight booking assistant
 builder.add_node(
     "enter_update_flight",
@@ -49,7 +48,7 @@ builder.add_node(
 
 
 def route_update_flight(
-    state: State,
+        state: State,
 ):
     route = tools_condition(state)
     if route == END:
@@ -117,7 +116,7 @@ builder.add_node(
 
 
 def route_book_car_rental(
-    state: State,
+        state: State,
 ):
     route = tools_condition(state)
     if route == END:
@@ -145,7 +144,6 @@ builder.add_conditional_edges(
     ],
 )
 
-
 # Hotel booking assistant
 builder.add_node(
     "enter_book_hotel", create_entry_node("Hotel Booking Assistant", "book_hotel")
@@ -163,7 +161,7 @@ builder.add_node(
 
 
 def route_book_hotel(
-    state: State,
+        state: State,
 ):
     route = tools_condition(state)
     if route == END:
@@ -186,7 +184,6 @@ builder.add_conditional_edges(
     ["leave_skill", "book_hotel_safe_tools", "book_hotel_sensitive_tools", END],
 )
 
-
 # Excursion assistant
 builder.add_node(
     "enter_book_excursion",
@@ -205,7 +202,7 @@ builder.add_node(
 
 
 def route_book_excursion(
-    state: State,
+        state: State,
 ):
     route = tools_condition(state)
     if route == END:
@@ -228,7 +225,6 @@ builder.add_conditional_edges(
     ["book_excursion_safe_tools", "book_excursion_sensitive_tools", "leave_skill", END],
 )
 
-
 # Primary assistant
 builder.add_node("primary_assistant", Assistant(assistant_runnable))
 builder.add_node(
@@ -237,7 +233,7 @@ builder.add_node(
 
 
 def route_primary_assistant(
-    state: State,
+        state: State,
 ):
     route = tools_condition(state)
     if route == END:
@@ -276,7 +272,7 @@ builder.add_edge("primary_assistant_tools", "primary_assistant")
 # Each delegated workflow can directly respond to the user
 # When the user responds, we want to return to the currently active workflow
 def route_to_workflow(
-    state: State,
+        state: State,
 ) -> Literal[
     "primary_assistant",
     "update_flight",

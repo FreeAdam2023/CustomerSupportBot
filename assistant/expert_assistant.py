@@ -2,11 +2,10 @@
 @Time ： 2024-10-28
 @Auth ： Adam Lyu
 """
-import json
 import os
 from datetime import datetime
 
-from langchain_anthropic import ChatAnthropic
+
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
@@ -17,9 +16,11 @@ from pydantic import BaseModel, Field
 
 from tools.car_rental_tools import search_car_rentals, book_car_rental, update_car_rental, cancel_car_rental
 from tools.excursion_tools import search_trip_recommendations, book_excursion, update_excursion, cancel_excursion
-from tools.flight_tools import update_ticket_to_new_flight, cancel_ticket, search_flights
+from tools.flight_tools import search_flights, update_ticket_to_new_flight, cancel_ticket
 from tools.hotel_tools import search_hotels, book_hotel, update_hotel, cancel_hotel
 from tools.lookup_policy import lookup_policy
+
+llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY')) # gpt-4-turbo  gpt-3.5-turbo
 
 
 class Assistant:
@@ -28,14 +29,14 @@ class Assistant:
 
     def __call__(self, state: State, config: RunnableConfig):
         while True:
-            # print(f"state -> {state}")
+            print(f"state -> {state}")
             # print(json.dumps(state, indent=4, ensure_ascii=False))
             result = self.runnable.invoke(state)
 
             if not result.tool_calls and (
-                    not result.content
-                    or isinstance(result.content, list)
-                    and not result.content[0].get("text")
+                not result.content
+                or isinstance(result.content, list)
+                and not result.content[0].get("text")
             ):
                 messages = state["messages"] + [("user", "Respond with a real output.")]
                 state = {**state, "messages": messages}
@@ -68,26 +69,7 @@ class CompleteOrEscalate(BaseModel):
         }
 
 
-
 # Flight booking assistant
-#
-# [
-#     (
-#         "system",
-#         "你是一位专门处理航班更新的助手。当用户需要帮助更新预订时，主助手会将工作委派给你。"
-#         "请确认更新后的航班详情，并告知客户任何额外费用。"
-#         "在搜索时，请保持耐心。如果首次搜索未返回结果，请扩大查询范围。"
-#         "如果需要更多信息或客户改变了主意，请将任务上报回主助手。"
-#         "记住，只有在成功使用相关工具后，预订才算完成。"
-#         "\n\n当前用户的航班信息：\n<航班>\n{user_info}\n</航班>"
-#         "\n当前时间：{time}。"
-#         "\n\n如果用户需要帮助，而你没有适当的工具可以使用，则"
-#         '使用 "CompleteOrEscalate" 将对话返回给主助手。不要浪费用户的时间。不要编造无效的工具或功能。',
-#     ),
-#     ("placeholder", "{messages}"),
-# ]
-
-llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY')) # gpt-4-turbo  gpt-3.5-turbo
 
 flight_booking_prompt = ChatPromptTemplate.from_messages(
     [
@@ -106,7 +88,7 @@ flight_booking_prompt = ChatPromptTemplate.from_messages(
         ),
         ("placeholder", "{messages}"),
     ]
-).partial(time=datetime.now())
+).partial(time=datetime.now)
 
 update_flight_safe_tools = [search_flights]
 update_flight_sensitive_tools = [update_ticket_to_new_flight, cancel_ticket]
@@ -159,7 +141,7 @@ book_hotel_prompt = ChatPromptTemplate.from_messages(
         ),
         ("placeholder", "{messages}"),
     ]
-).partial(time=datetime.now())
+).partial(time=datetime.now)
 
 book_hotel_safe_tools = [search_hotels]
 book_hotel_sensitive_tools = [book_hotel, update_hotel, cancel_hotel]
@@ -189,7 +171,6 @@ book_hotel_runnable = book_hotel_prompt | llm.bind_tools(
 #     ("placeholder", "{messages}"),
 # ]
 
-
 # Car Rental Assistant
 book_car_rental_prompt = ChatPromptTemplate.from_messages(
     [
@@ -213,7 +194,7 @@ book_car_rental_prompt = ChatPromptTemplate.from_messages(
         ),
         ("placeholder", "{messages}"),
     ]
-).partial(time=datetime.now())
+).partial(time=datetime.now)
 
 book_car_rental_safe_tools = [search_car_rentals]
 book_car_rental_sensitive_tools = [
@@ -267,7 +248,7 @@ book_excursion_prompt = ChatPromptTemplate.from_messages(
         ),
         ("placeholder", "{messages}"),
     ]
-).partial(time=datetime.now())
+).partial(time=datetime.now)
 
 book_excursion_safe_tools = [search_trip_recommendations]
 book_excursion_sensitive_tools = [book_excursion, update_excursion, cancel_excursion]
@@ -280,7 +261,7 @@ book_excursion_runnable = book_excursion_prompt | llm.bind_tools(
 # Primary Assistant
 class ToFlightBookingAssistant(BaseModel):
     """Transfers work to a specialized assistant to handle flight updates and cancellations."""
-    # 更新飞行助理在继续之前应澄清任何必要的后续问题。
+
     request: str = Field(
         description="Any necessary followup questions the update flight assistant should clarify before proceeding."
     )
@@ -290,7 +271,7 @@ class ToBookCarRental(BaseModel):
     """Transfers work to a specialized assistant to handle car rental bookings."""
 
     location: str = Field(
-        description="The location where the user wants to rent a car." # 用户想要租车的地点。
+        description="The location where the user wants to rent a car."
     )
     start_date: str = Field(description="The start date of the car rental.")
     end_date: str = Field(description="The end date of the car rental.")
@@ -391,8 +372,7 @@ primary_assistant_prompt = ChatPromptTemplate.from_messages(
         ),
         ("placeholder", "{messages}"),
     ]
-).partial(time=datetime.now())
-
+).partial(time=datetime.now)
 primary_assistant_tools = [
     TavilySearchResults(max_results=1),
     search_flights,

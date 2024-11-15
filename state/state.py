@@ -15,15 +15,13 @@ def update_dialog_stack(left: list[str], right: Optional[str]) -> list[str]:
 
     # 根据操作更新堆栈
     if right is None:
-        result = left
-    elif right == "pop":
-        result = left[:-1]
-    else:
-        result = left + [right]
-
-    # 打印更新后的堆栈状态
-    print("更新后的堆栈:", result)
-    return result
+        print("更新后的堆栈:", left)
+        return left
+    if right == "pop":
+        print("更新后的堆栈:", left[:-1])
+        return left[:-1]
+    print("更新后的堆栈:", left + [right])
+    return left + [right]
 
 
 class State(TypedDict):
