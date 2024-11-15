@@ -19,7 +19,7 @@ config = {
     "configurable": {
         # The passenger_id is used in our flight tools to
         # fetch the user's flight information
-        "passenger_id": "3442 587242", # ticket no: 7240005432906569	book ref C46E9F	passenger id 3442 587242
+        "passenger_id": "3442 587242",  # ticket no: 7240005432906569	book ref C46E9F	passenger id 3442 587242
         # Checkpoints are accessed by thread_id
         "thread_id": thread_id,
     }
@@ -49,7 +49,8 @@ config = {
 # ]
 
 tutorial_questions = [
-    "你好，我的航班是什么时候？",  # 您的航班是从巴黎戴高乐机场(CDG)飞往巴塞尔机场(BSL)的LX0112航班，定于2024年11月14日10:42分（当地时间）起飞。预计到达时间是同日12:12。请提前到机场，确保有足够时间办理登机手续。
+    "你好，我的航班是什么时候？",
+    # 您的航班是从巴黎戴高乐机场(CDG)飞往巴塞尔机场(BSL)的LX0112航班，定于2024年11月14日10:42分（当地时间）起飞。预计到达时间是同日12:12。请提前到机场，确保有足够时间办理登机手续。
     "我可以把航班改成早点的吗？我想今天晚些时候离开。",
     "那就把我的航班改到下周的某个时间吧。",
     "下一个可选的时间很好。",
@@ -65,10 +66,10 @@ tutorial_questions = [
     "好的，挑一个，在我到达的第二天预订。",
 ]
 
-
 _printed = set()
-# We can reuse the tutorial questions from part 1 to see how it does.
 
+
+# We can reuse the tutorial questions from part 1 to see how it does.
 
 
 def test_conversation():
@@ -81,6 +82,8 @@ def test_conversation():
             logger.debug(f"Event processed: {event}")
         snapshot = part_4_graph.get_state(config)
         while snapshot.next:
+            # 我们有一个中断！代理正在尝试使用工具，用户可以批准或拒绝它
+            # 注意：此代码全部位于您的图表之外。通常，您会将输出流式传输到 UI。 # 然后，当用户提供输入时，您将让前端通过 API 调用触发新的运行。
             # 如果有中断，记录当前调用的 tool_call_id 和事件
             if 'tool_calls' in event["messages"][-1]:
                 for tool_call in event["messages"][-1]['tool_calls']:

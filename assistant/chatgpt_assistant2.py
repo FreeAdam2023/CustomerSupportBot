@@ -14,6 +14,7 @@ from state.state2 import State
 
 load_dotenv()  # 加载 .env 文件中的环境变量
 
+
 # Assistant 类，用于处理调用逻辑
 class Assistant:
     def __init__(self, runnable: Runnable):
@@ -24,15 +25,16 @@ class Assistant:
             result = self.runnable.invoke(state)
             # 检查是否有返回内容，若无则重新生成提示信息
             if not result.tool_calls and (
-                not result.content
-                or isinstance(result.content, list)
-                and not result.content[0].get("text")
+                    not result.content
+                    or isinstance(result.content, list)
+                    and not result.content[0].get("text")
             ):
                 messages = state["messages"] + [("user", "Respond with a real output.")]
                 state = {**state, "messages": messages}
             else:
                 break
         return {"messages": result}
+
 
 # 使用 ChatOpenAI 替换 ChatAnthropic
 llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY'))

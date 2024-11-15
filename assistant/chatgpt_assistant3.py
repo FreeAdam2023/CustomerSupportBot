@@ -8,7 +8,6 @@ from tools.excursion_tools import search_trip_recommendations, book_excursion, u
 from tools.flight_tools import fetch_user_flight_information, search_flights, update_ticket_to_new_flight, cancel_ticket
 from tools.hotel_tools import search_hotels, book_hotel, update_hotel, cancel_hotel
 
-
 from typing import Annotated
 
 from langchain_anthropic import ChatAnthropic
@@ -37,9 +36,9 @@ class Assistant:
             # If the LLM happens to return an empty response, we will re-prompt it
             # for an actual response.
             if not result.tool_calls and (
-                not result.content
-                or isinstance(result.content, list)
-                and not result.content[0].get("text")
+                    not result.content
+                    or isinstance(result.content, list)
+                    and not result.content[0].get("text")
             ):
                 messages = state["messages"] + [("user", "Respond with a real output.")]
                 state = {**state, "messages": messages}
@@ -57,7 +56,6 @@ class Assistant:
 # llm = ChatOpenAI(model="gpt-4-turbo-preview")
 llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY'))
 
-
 assistant_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -72,7 +70,6 @@ assistant_prompt = ChatPromptTemplate.from_messages(
         ("placeholder", "{messages}"),
     ]
 ).partial(time=datetime.now())
-
 
 # "Read"-only tools (such as retrievers) don't need a user confirmation to use
 part_3_safe_tools = [

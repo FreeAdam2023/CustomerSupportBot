@@ -7,6 +7,7 @@ from scripts.populate_database import db
 from scripts.populate_database import update_dates
 from graph.graph1 import part_1_graph
 from utils.utilities import _print_event
+
 #
 # # Let's create an example conversation a user might have with the assistant
 # tutorial_questions = [
@@ -27,7 +28,8 @@ from utils.utilities import _print_event
 # ]
 
 tutorial_questions = [
-    "你好，我的航班是什么时候？",  # 您的航班是从巴黎戴高乐机场(CDG)飞往巴塞尔机场(BSL)的LX0112航班，定于2024年11月14日10:42分（当地时间）起飞。预计到达时间是同日12:12。请提前到机场，确保有足够时间办理登机手续。
+    "你好，我的航班是什么时候？",
+    # 您的航班是从巴黎戴高乐机场(CDG)飞往巴塞尔机场(BSL)的LX0112航班，定于2024年11月14日10:42分（当地时间）起飞。预计到达时间是同日12:12。请提前到机场，确保有足够时间办理登机手续。
     "我可以把航班改成早点的吗？我想今天晚些时候离开。",
     "那就把我的航班改到下周的某个时间吧。",
     "下一个可选的时间很好。",
@@ -57,7 +59,6 @@ config = {
     }
 }
 
-
 _printed = set()
 # for question in tutorial_questions:
 #     events = part_1_graph.stream(
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     while True:
         question = input("input question please\n\n")
         events = part_1_graph.stream(
-                {"messages": ("user", question)}, config, stream_mode="values"
-            )
+            {"messages": ("user", question)}, config, stream_mode="values"
+        )
         for event in events:
             _print_event(event, _printed)

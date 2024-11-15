@@ -49,7 +49,7 @@ class Assistant:
 # Haiku is faster and cheaper, but less accurate
 # llm = ChatAnthropic(model="claude-3-haiku-20240307")
 # llm = ChatAnthropic(model="claude-3-sonnet-20240229", temperature=1, api_key=os.getenv('ANTHROPIC_API_KEY'))
-llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY')) # gpt-4-turbo  gpt-3.5-turbo
+llm = ChatOpenAI(model="gpt-4-turbo", temperature=1, api_key=os.getenv('OPENAI_API_KEY'))  # gpt-4-turbo  gpt-3.5-turbo
 # You could swap LLMs, though you will likely want to update the prompts when
 # doing so!
 # from langchain_openai import ChatOpenAI
